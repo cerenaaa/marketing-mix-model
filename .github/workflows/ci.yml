@@ -1,0 +1,14 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy pandas scikit-learn statsmodels scipy pytest
+      - run: python -c "from data.synthetic_marketing import generate_marketing_data; df=generate_marketing_data(52); assert len(df)==52; print('marketing data OK')"
+      - run: python -c "from models.adstock import apply_adstock, weibull_saturation; import numpy as np; x=np.array([100,50,0,0]); a=apply_adstock(x,0.5); assert a[0]==100; print('adstock OK')"
+      - run: python -c "from attribution.markov_attribution import markov_attribution; r=markov_attribution([['tv','digital'],['digital'],['tv']], ['tv','digital'], 1000); assert len(r)==2; print('markov OK')"
